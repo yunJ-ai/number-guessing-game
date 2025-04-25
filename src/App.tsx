@@ -10,6 +10,13 @@ function App() {
   const [dialogMessage, setDialogMessage] = useState("");
   const [gameOver, setGameOver] = useState(false); // 게임 종료 상태
   const MAX_TRIES = 10; // 최대 시도 횟수
+  const [bestScore, setBestScore] = useState(() => {
+    const bestScore = localStorage.getItem("bestScore");
+    return bestScore ? Number(bestScore) : null;
+  });
+
+  // 답
+  console.log("🔐정답:", targetNumber);
 
   // 랜덤 숫자 생성
   function generateRandomNumber() {
@@ -29,7 +36,7 @@ function App() {
     }
 
     const updateTries = tries + 1; // 시도 횟수 증가
-    setTries(updateTries); // 시도 횟수 증가
+    setTries(updateTries);
 
     if (updateTries === MAX_TRIES) {
       setShowDialog(true); // 다이얼로그 표시
@@ -41,6 +48,11 @@ function App() {
     if (guess === targetNumber) {
       setMessage("🎉 축하합니다! 🎉");
       setGameOver(true); // 게임 종료 상태 설정
+
+      if (bestScore === null || updateTries < bestScore) {
+        localStorage.setItem("bestScore", String(updateTries));
+        setBestScore(updateTries); // 최고 점수 업데이트
+      }
     } else if (guess < targetNumber) {
       setMessage("UP!");
     } else {
@@ -61,6 +73,7 @@ function App() {
 
   return (
     <>
+      {/* showDialog 말고 다른 방법 context  */}
       {showDialog && (
         <div className="bg-white fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 p-8 shadow-lg rounded-md">
           <div className="text-lg font-semibold mb-4 text-gray-900">🔔</div>
@@ -101,6 +114,7 @@ function App() {
           <p>
             {MAX_TRIES} 중 {tries}번 시도했어요!
           </p>
+          <p>최고 점수: {bestScore ?? "기록 없음"}</p>
         </div>
         <button
           className=" text-white bg-blue-400 hover:bg-blue-500 rounded-full px-8 py-2 mx-2 my-4"
